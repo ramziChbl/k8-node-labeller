@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 from kubernetes import client, config, watch
 import sys, logging, os
 
