@@ -5,17 +5,20 @@ metadata:
   name: node-labeller-sa
 
 ---
+# Using ClusterRole instead of Role to grant access to cluster-scoped resources and not only within namespaces
+# This gives the necessary access to update a node label, there might be some non-required verbs
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   namespace: default
-  name: nodes-reader-role
+  name: nodes-labeller-role
 rules:
 - apiGroups: [""]
   resources: ["nodes"]
   verbs: ["get", "list", "watch", "update", "patch"]
 
 ---
+# Using ClusterRoleBinding to bind ClusterRole to the ServiceAccount
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -27,7 +30,7 @@ subjects:
   namespace: default
 roleRef:
   kind: ClusterRole
-  name: nodes-reader-role
+  name: nodes-labeller-role
   apiGroup: rbac.authorization.k8s.io
 
 ---
@@ -42,6 +45,7 @@ spec:
   - name: node-labeller-container
     image: ramzichbl/k8-node-labeller
     env:
+    # Change this value to specify node labels
     - name: NODES_LABEL
       value: "worker-node"
 
